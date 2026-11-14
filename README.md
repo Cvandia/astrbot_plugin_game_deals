@@ -79,6 +79,17 @@ python -m pip install -r data/plugins/astrbot_plugin_game_deals/requirements.txt
 
 更多配置、权限、数据备份与投递边界见 [详细说明](docs/usage.md)。
 
+## 🛠️ 开发检查
+
+```bash
+python -m pip install -r requirements.txt 'pre-commit>=4,<5'
+pre-commit install
+pre-commit run --all-files
+python -m unittest discover -s tests -q
+```
+
+GitHub Actions 会运行 pre-commit，以及 Python **3.10 / 3.11 / 3.12 / 3.13 / 3.14** 的离线测试与语法检查。
+
 ## 💝 鸣谢
 
 [AstrBot](https://github.com/AstrBotDevs/AstrBot) · [APScheduler](https://github.com/agronholm/apscheduler) · [Pillow](https://github.com/python-pillow/Pillow) · [heybox-url](https://github.com/huandu/heybox-url) · [Noto Sans SC](https://github.com/notofonts/noto-cjk)

@@ -2,6 +2,13 @@
 
 本仓库首次公开版本为 v1.4.1；此前版本记录对应开发过程中的功能迭代。
 
+## 未发布
+
+- 修复 pre-commit.ci 因缺少 `.pre-commit-config.yaml` 而无法运行的问题。
+- 使用独立 hook 环境运行 Ruff、格式与 YAML/TOML 检查，无需预装 uv。
+- 统一代码格式、清理未使用导入，并完善异常链与异步预览脚本。
+- GitHub Actions 增加 pre-commit 检查与 Python 3.10–3.14 测试矩阵。
+
 ## v1.4.1 · 2026-11-14
 
 - 按项目模板整理简要 README，完整说明迁移到 `docs/usage.md`。

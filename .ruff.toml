@@ -1,0 +1,11 @@
+target-version = "py310"
+line-length = 100
+
+[lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "ASYNC"]
+
+[lint.per-file-ignores]
+# Standalone scripts/tests add the plugin directory before importing its modules.
+"tests/*.py" = ["E402"]
+"smoke_*.py" = ["E402"]
+"preview_digest.py" = ["E402"]

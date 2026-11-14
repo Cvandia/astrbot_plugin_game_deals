@@ -1,14 +1,15 @@
 """Steam data source and persistent subscription service; independent of AstrBot."""
+
 from __future__ import annotations
 
 import asyncio
-from dataclasses import dataclass
-from datetime import datetime
 import logging
-from pathlib import Path
 import re
 import sqlite3
 import time
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import aiohttp
@@ -27,7 +28,9 @@ def clock_time(value: str) -> str:
 
 
 def app_id(value: str) -> str:
-    match = re.fullmatch(r"(?:https?://store\.steampowered\.com/app/)?([1-9]\d{0,9})(?:/[^\s]*)?", value)
+    match = re.fullmatch(
+        r"(?:https?://store\.steampowered\.com/app/)?([1-9]\d{0,9})(?:/[^\s]*)?", value
+    )
     if not match:
         raise ValueError("请提供 Steam AppID 或商店游戏链接；先用“搜索”查找 ID。")
     return match[1]
@@ -51,8 +54,13 @@ class Game:
 
     @property
     def discounted(self) -> bool:
-        return (not self.free and self.percent > 0 and self.original is not None
-                and self.final is not None and self.original > self.final >= 0)
+        return (
+            not self.free
+            and self.percent > 0
+            and self.original is not None
+            and self.final is not None
+            and self.original > self.final >= 0
+        )
 
     def text(self) -> str:
         if self.free:
@@ -65,7 +73,9 @@ class Game:
             price = f"{self.currency} {self.final / 100:.2f}（无折扣）"
         end = ""
         if self.expires:
-            end = "\n预计结束：" + datetime.fromtimestamp(self.expires, ZoneInfo("Asia/Shanghai")).strftime("%m-%d %H:%M 北京时间")
+            end = "\n预计结束：" + datetime.fromtimestamp(
+                self.expires, ZoneInfo("Asia/Shanghai")
+            ).strftime("%m-%d %H:%M 北京时间")
         label = f" [{self.platform}]" if self.platform else ""
         region = f"\n地区：{self.region}" if self.region else ""
         link = self.url or f"https://store.steampowered.com/app/{self.id}/"
@@ -76,6 +86,7 @@ class Game:
 
 class SteamSource:
     """Public store APIs. A short cache coalesces checks across sessions."""
+
     def __init__(self, country: str = "cn", timeout: int = 20):
         if not re.fullmatch(r"[a-z]{2}", country):
             raise ValueError("country 应为两位小写地区代码，例如 cn。")
@@ -93,11 +104,15 @@ class SteamSource:
     async def request(self, endpoint: str, **params):
         if self.session is None:
             self.session = aiohttp.ClientSession(
-                timeout=aiohttp.ClientTimeout(total=self.timeout), trust_env=True,
-                headers={"User-Agent": "AstrBot-GameDeals/1.0"})
+                timeout=aiohttp.ClientTimeout(total=self.timeout),
+                trust_env=True,
+                headers={"User-Agent": "AstrBot-GameDeals/1.0"},
+            )
         try:
-            async with self.session.get("https://store.steampowered.com/api/" + endpoint,
-                                        params={"cc": self.country, "l": "schinese", **params}) as response:
+            async with self.session.get(
+                "https://store.steampowered.com/api/" + endpoint,
+                params={"cc": self.country, "l": "schinese", **params},
+            ) as response:
                 response.raise_for_status()
                 data = await response.json(content_type=None)
                 if not isinstance(data, dict):
@@ -108,8 +123,9 @@ class SteamSource:
 
     async def search(self, term: str) -> list[tuple[str, str]]:
         data = await self.request("storesearch/", term=term)
-        return [(str(x["id"]), x["name"]) for x in data.get("items", [])
-                if x.get("type") == "app"][:8]
+        return [(str(x["id"]), x["name"]) for x in data.get("items", []) if x.get("type") == "app"][
+            :8
+        ]
 
     async def today(self, limit: int = 10) -> list[Game]:
         data = await self.request("featuredcategories/")
@@ -119,9 +135,15 @@ class SteamSource:
         for x in data["specials"]["items"]:
             if x.get("type") != 0:
                 continue
-            game = Game(str(x["id"]), x["name"], x.get("currency", ""),
-                        x.get("original_price"), x.get("final_price"),
-                        x.get("discount_percent", 0), expires=x.get("discount_expiration"))
+            game = Game(
+                str(x["id"]),
+                x["name"],
+                x.get("currency", ""),
+                x.get("original_price"),
+                x.get("final_price"),
+                x.get("discount_percent", 0),
+                expires=x.get("discount_expiration"),
+            )
             if game.discounted:
                 games.append(game)
         return games[:limit]
@@ -137,8 +159,15 @@ class SteamSource:
                 raise SourceError("未找到此游戏，或当前地区不可访问。")
             x = item["data"]
             p = x.get("price_overview") or {}
-            result = Game(id_, x["name"], p.get("currency", ""), p.get("initial"),
-                          p.get("final"), p.get("discount_percent", 0), x.get("is_free", False))
+            result = Game(
+                id_,
+                x["name"],
+                p.get("currency", ""),
+                p.get("initial"),
+                p.get("final"),
+                p.get("discount_percent", 0),
+                x.get("is_free", False),
+            )
             # Bound memory even when many different games are queried.
             if len(self.cache) >= 1000:
                 self.cache.clear()
@@ -165,7 +194,10 @@ class Store:
 
     def ensure(self, origin: str):
         with self.db:
-            self.db.execute("INSERT OR IGNORE INTO sessions(origin,time) VALUES (?,?)", (origin, self.default_time))
+            self.db.execute(
+                "INSERT OR IGNORE INTO sessions(origin,time) VALUES (?,?)",
+                (origin, self.default_time),
+            )
 
     def settings(self, origin: str):
         self.ensure(origin)
@@ -175,26 +207,38 @@ class Store:
         self.ensure(origin)
         with self.db:
             if at is not None:
-                self.db.execute("UPDATE sessions SET time=? WHERE origin=?", (clock_time(at), origin))
+                self.db.execute(
+                    "UPDATE sessions SET time=? WHERE origin=?", (clock_time(at), origin)
+                )
             if enabled is not None:
-                self.db.execute("UPDATE sessions SET enabled=? WHERE origin=?", (int(enabled), origin))
+                self.db.execute(
+                    "UPDATE sessions SET enabled=? WHERE origin=?", (int(enabled), origin)
+                )
 
     def subscriptions(self, origin: str):
-        return self.db.execute("SELECT * FROM subscriptions WHERE origin=? ORDER BY appid", (origin,)).fetchall()
+        return self.db.execute(
+            "SELECT * FROM subscriptions WHERE origin=? ORDER BY appid", (origin,)
+        ).fetchall()
 
     def subscribe(self, origin: str, game: Game, owner: str, limit: int) -> bool:
         self.ensure(origin)
-        if self.db.execute("SELECT 1 FROM subscriptions WHERE origin=? AND appid=?", (origin, game.id)).fetchone():
+        if self.db.execute(
+            "SELECT 1 FROM subscriptions WHERE origin=? AND appid=?", (origin, game.id)
+        ).fetchone():
             return False
         if len(self.subscriptions(origin)) >= limit:
             raise ValueError(f"本会话最多订阅 {limit} 个游戏，请先退订。")
         with self.db:
-            self.db.execute("INSERT INTO subscriptions(origin,appid,name,owner) VALUES (?,?,?,?)",
-                            (origin, game.id, game.name, owner))
+            self.db.execute(
+                "INSERT INTO subscriptions(origin,appid,name,owner) VALUES (?,?,?,?)",
+                (origin, game.id, game.name, owner),
+            )
         return True
 
     def unsubscribe(self, origin: str, id_: str, owner: str, admin: bool) -> bool:
-        row = self.db.execute("SELECT owner FROM subscriptions WHERE origin=? AND appid=?", (origin, id_)).fetchone()
+        row = self.db.execute(
+            "SELECT owner FROM subscriptions WHERE origin=? AND appid=?", (origin, id_)
+        ).fetchone()
         if not row:
             return False
         if row["owner"] != owner and not admin:
@@ -204,15 +248,19 @@ class Store:
         return True
 
     def due(self, now: datetime):
-        return self.db.execute("""SELECT sub.* FROM subscriptions sub JOIN sessions s ON s.origin=sub.origin
+        return self.db.execute(
+            """SELECT sub.* FROM subscriptions sub JOIN sessions s ON s.origin=sub.origin
             WHERE s.enabled=1 AND s.time<=? AND (sub.last_checked IS NULL OR sub.last_checked<>?)""",
-                               (now.strftime("%H:%M"), now.date().isoformat())).fetchall()
+            (now.strftime("%H:%M"), now.date().isoformat()),
+        ).fetchall()
 
     def mark(self, origin: str, id_: str, day: str, notified: bool):
         with self.db:
-            self.db.execute("""UPDATE subscriptions SET last_checked=?,
+            self.db.execute(
+                """UPDATE subscriptions SET last_checked=?,
                 last_notified=CASE WHEN ? THEN ? ELSE last_notified END WHERE origin=? AND appid=?""",
-                            (day, notified, day, origin, id_))
+                (day, notified, day, origin, id_),
+            )
 
     def close(self):
         self.db.close()
@@ -237,8 +285,12 @@ class Watcher:
                     game = await self.source.game(row["appid"])
                     notified = False
                     if game.discounted and row["last_notified"] != day:
-                        result = await self.send(row["origin"], "🎮 订阅游戏折扣提醒\n" + game.text()
-                                                 + f"\n数据：{game.source}\n检查日期：{day}")
+                        result = await self.send(
+                            row["origin"],
+                            "🎮 订阅游戏折扣提醒\n"
+                            + game.text()
+                            + f"\n数据：{game.source}\n检查日期：{day}",
+                        )
                         if result is False:
                             raise RuntimeError("平台未找到或不支持主动消息")
                         notified = True
