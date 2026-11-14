@@ -1,0 +1,66 @@
+{
+  "country": {
+    "description": "Steam 地区代码，cn 为中国大陆（更改后价格、可售状态可能变化）",
+    "type": "string",
+    "default": "cn"
+  },
+  "timezone": {
+    "description": "检查时区（IANA 名称）",
+    "type": "string",
+    "default": "Asia/Shanghai"
+  },
+  "default_time": {
+    "description": "新会话默认每日检查时间 HH:MM",
+    "type": "string",
+    "default": "09:00"
+  },
+  "max_subscriptions": {
+    "description": "每会话订阅上限（1-200）",
+    "type": "int",
+    "default": 50
+  },
+  "request_timeout": {
+    "description": "每个数据源的请求超时秒数（5-60）",
+    "type": "int",
+    "default": 20
+  },
+  "default_source": {
+    "description": "默认来源：jump(Switch 2)、switch(Jump Switch)、heybox(小黑盒)、steam",
+    "type": "string",
+    "default": "jump"
+  },
+  "jump_max_pages": {
+    "description": "Jump 单次搜索/折扣扫描页数上限（1-20），非全站完整列表",
+    "type": "int",
+    "default": 5
+  },
+  "heybox_max_pages": {
+    "description": "小黑盒匿名目录最多扫描页数（每页30款，1-20）；非全站关键词搜索",
+    "type": "int",
+    "default": 5
+  },
+  "digest_send_mode": {
+    "description": "日报全局发送方式（既有订阅跟随此设置），修改后重载插件",
+    "type": "string",
+    "default": "text",
+    "options": [
+      "text",
+      "image"
+    ]
+  },
+  "digest_image_fallback": {
+    "description": "图片生成或发送失败时回退文字；关闭后按失败重试",
+    "type": "bool",
+    "default": true
+  },
+  "digest_image_rows": {
+    "description": "每张日报图片最多游戏数（1-10），自动分页",
+    "type": "int",
+    "default": 8
+  },
+  "digest_font_path": {
+    "description": "可选中文字体文件路径；留空使用插件自带开源 Noto Sans SC 字体",
+    "type": "string",
+    "default": ""
+  }
+}

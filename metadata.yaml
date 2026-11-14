@@ -1,0 +1,17 @@
+name: astrbot_plugin_game_deals
+display_name: 游戏折扣订阅
+desc: Jump 与小黑盒同款比价、Steam 查价，支持群聊/私聊游戏订阅、每日图文折扣日报和 LLM 工具。
+version: v1.4.1
+author: Cvandia
+repo: https://github.com/Cvandia/astrbot_plugin_game_deals
+astrbot_version: ">=4.13.0,<5"
+support_platforms:
+  - aiocqhttp
+  - telegram
+social_link: https://github.com/Cvandia
+tags:
+  - 游戏
+  - 折扣
+  - 订阅
+  - Switch
+  - Steam
