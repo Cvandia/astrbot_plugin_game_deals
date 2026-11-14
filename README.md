@@ -95,3 +95,9 @@ GitHub Actions 会运行 pre-commit，以及 Python **3.10 / 3.11 / 3.12 / 3.13 
 [AstrBot](https://github.com/AstrBotDevs/AstrBot) · [APScheduler](https://github.com/agronholm/apscheduler) · [Pillow](https://github.com/python-pillow/Pillow) · [heybox-url](https://github.com/huandu/heybox-url) · [Noto Sans SC](https://github.com/notofonts/noto-cjk)
 
 README 排版参考 [uv-project-template](https://github.com/Cvandia/uv-project-template)。项目采用 [MIT](LICENSE)，第三方算法和字体保留各自的 [许可证](licenses/)。
+
+## 👥 贡献者
+
+<a href="https://github.com/Cvandia/astrbot_plugin_game_deals/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Cvandia/astrbot_plugin_game_deals&amp;max=1000" alt="贡献者" />
+</a>
