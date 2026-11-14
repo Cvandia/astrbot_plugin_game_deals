@@ -1,9 +1,8 @@
-"""Steam data source and persistent subscription service; independent of AstrBot."""
+"""Steam data source and persistent subscription service."""
 
 from __future__ import annotations
 
 import asyncio
-import logging
 import re
 import sqlite3
 import time
@@ -13,8 +12,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import aiohttp
-
-log = logging.getLogger(__name__)
+from astrbot.api import logger
 
 
 class SourceError(Exception):
@@ -299,6 +297,6 @@ class Watcher:
                 except Exception:
                     # A failed lookup/send remains due. Retry at most once every five minutes.
                     self.retry_after[key] = time.monotonic() + 300
-                    log.exception("折扣查询或通知失败；5 分钟后重试，AppID=%s", row["appid"])
+                    logger.exception("折扣查询或通知失败；5 分钟后重试，AppID=%s", row["appid"])
             active = {(r["origin"], r["appid"]) for r in self.store.due(now)}
             self.retry_after = {k: v for k, v in self.retry_after.items() if k in active}

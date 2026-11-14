@@ -4,6 +4,8 @@
 
 ## 未发布
 
+- 所有插件业务日志统一使用 `from astrbot.api import logger`，离线测试单独提供 API 替身。
+
 - 修复 pre-commit.ci 因缺少 `.pre-commit-config.yaml` 而无法运行的问题。
 - 使用独立 hook 环境运行 Ruff、格式与 YAML/TOML 检查，无需预装 uv。
 - 统一代码格式、清理未使用导入，并完善异常链与异步预览脚本。

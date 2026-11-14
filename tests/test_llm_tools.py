@@ -149,7 +149,8 @@ class ToolTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(result["ok"])
         self.assertIn("Jump", result["error"])
         self.plugin.source.search.side_effect = RuntimeError("secret internal detail")
-        result = json.loads(await self.plugin.tool_search_games(Event(), "test", "steam"))
+        with self.assertLogs("astrbot", level="ERROR"):
+            result = json.loads(await self.plugin.tool_search_games(Event(), "test", "steam"))
         self.assertFalse(result["ok"])
         self.assertNotIn("secret", result["error"])
 

@@ -241,7 +241,7 @@ class DigestTests(unittest.IsolatedAsyncioTestCase):
         self.source.today.return_value = [sale(name="x" * 5000)]
         self.service.manage(self.event, "subscribe", at="09:00")
         self.send.side_effect = [True, False]
-        with self.assertLogs("astrbot_plugin_game_deals.digest", level="ERROR"):
+        with self.assertLogs("astrbot", level="ERROR"):
             await self.service.tick(now())
         first = self.send.await_args_list[0].args[1]
         self.store.close()
@@ -261,7 +261,7 @@ class DigestTests(unittest.IsolatedAsyncioTestCase):
         failed.today.side_effect = SourceError("offline")
         self.service.sources["heybox"] = failed
         self.service.manage(self.event, "subscribe", source="all", at="09:00")
-        with self.assertLogs("astrbot_plugin_game_deals.digest", level="ERROR"):
+        with self.assertLogs("astrbot", level="ERROR"):
             await self.service.tick(now())
         self.send.assert_awaited_once()
         self.assertTrue(self.service.retry_after)

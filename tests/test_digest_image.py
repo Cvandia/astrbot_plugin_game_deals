@@ -93,7 +93,7 @@ class ImageDeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.service.image_fallback = False
         self.service.manage(self.event, "subscribe", at="09:00")
         self.image.side_effect = [True, False]
-        with self.assertLogs("astrbot_plugin_game_deals.digest", level="ERROR"):
+        with self.assertLogs("astrbot", level="ERROR"):
             await self.service.tick(at())
         self.assertEqual(self.image.await_args_list[0].args[1]["pages"], 3)
         self.store.close()
@@ -112,7 +112,7 @@ class ImageDeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.service.manage(self.event, "subscribe", at="09:00")
         self.image.side_effect = RuntimeError("render error")
         self.send.side_effect = [True, False]
-        with self.assertLogs("astrbot_plugin_game_deals.digest", level="WARNING"):
+        with self.assertLogs("astrbot", level="WARNING"):
             await self.service.tick(at())
         first = self.send.await_args_list[0].args[1]
         row = self.store.db.execute("SELECT * FROM digest_parts").fetchone()
@@ -134,7 +134,7 @@ class ImageDeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.service.image_fallback = False
         self.service.manage(self.event, "subscribe", at="09:00")
         self.image.return_value = False
-        with self.assertLogs("astrbot_plugin_game_deals.digest", level="ERROR"):
+        with self.assertLogs("astrbot", level="ERROR"):
             await self.service.tick(at())
         self.send.assert_not_awaited()
         self.assertEqual(
@@ -145,7 +145,7 @@ class ImageDeliveryTests(unittest.IsolatedAsyncioTestCase):
         self.service.image_fallback = False
         self.image.return_value = False
         self.service.manage(self.event, "subscribe", at="09:00")
-        with self.assertLogs("astrbot_plugin_game_deals.digest", level="ERROR"):
+        with self.assertLogs("astrbot", level="ERROR"):
             await self.service.tick(at())
         self.service.manage(self.event, "set_mode", mode="text")
         self.service.retry_after.clear()

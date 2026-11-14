@@ -8,6 +8,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
+from astrbot_test_support import install_logger_stub
+
+install_logger_stub()
+
 from deals import Game, Store, Watcher
 
 
@@ -15,7 +19,7 @@ def load_plugin():
     api = types.ModuleType("astrbot.api")
     api.AstrBotConfig = dict
     api.llm_tool = lambda **kwargs: lambda fn: fn
-    api.logger = types.SimpleNamespace(exception=lambda *a: None)
+    api.logger = install_logger_stub()
     event = types.ModuleType("astrbot.api.event")
     event.AstrMessageEvent = object
     event.MessageChain = object

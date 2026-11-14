@@ -2,16 +2,15 @@
 
 import asyncio
 import json
-import logging
 import time
 from dataclasses import asdict
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from astrbot.api import logger
+
 from .deals import clock_time
 from .digest_image import mode_name
-
-log = logging.getLogger(__name__)
 
 
 class DigestService:
@@ -222,7 +221,7 @@ class DigestService:
                         self.retry_after.pop(key, None)
                 except Exception:
                     self.retry_after[key] = time.monotonic() + 300
-                    log.exception("每日折扣日报失败；5分钟后重试，来源=%s", row["source"])
+                    logger.exception("每日折扣日报失败；5分钟后重试，来源=%s", row["source"])
 
     @staticmethod
     def _text(source, day, games):
@@ -247,7 +246,7 @@ class DigestService:
             except Exception:
                 if not self.image_fallback:
                     raise
-                log.warning("日报图片生成/发送失败，本页回退文字", exc_info=True)
+                logger.warning("日报图片生成/发送失败，本页回退文字", exc_info=True)
                 with self.store.db:
                     self.store.db.execute(
                         "UPDATE digest_parts SET kind='fallback' WHERE origin=? AND source=? AND day=? AND part=?",

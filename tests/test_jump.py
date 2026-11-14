@@ -8,6 +8,10 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 from zoneinfo import ZoneInfo
 
+from astrbot_test_support import install_logger_stub
+
+install_logger_stub()
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from astrbot_plugin_game_deals.deals import SourceError, Store, Watcher
 from astrbot_plugin_game_deals.jump import JumpSource, SourceRouter, jump_id, money

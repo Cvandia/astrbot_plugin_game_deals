@@ -6,6 +6,10 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 from zoneinfo import ZoneInfo
 
+from astrbot_test_support import install_logger_stub
+
+install_logger_stub()
+
 from deals import Game, SourceError, SteamSource, Store, Watcher, app_id, clock_time
 
 SALE = Game("123", "测试游戏", "CNY", 10000, 5000, 50)
@@ -91,7 +95,7 @@ class WatcherTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_source_failure_retries_without_marking(self):
         self.source.game.side_effect = SourceError("offline")
-        with self.assertLogs("deals", level="ERROR"):
+        with self.assertLogs("astrbot", level="ERROR"):
             await self.watcher.tick(at())
         self.assertEqual(len(self.store.due(at())), 1)
         await self.watcher.tick(at())
@@ -106,7 +110,7 @@ class WatcherTests(unittest.IsolatedAsyncioTestCase):
             self.send.side_effect = result if isinstance(result, Exception) else None
             self.send.return_value = result
             self.watcher.retry_after.clear()
-            with self.assertLogs("deals", level="ERROR"):
+            with self.assertLogs("astrbot", level="ERROR"):
                 await self.watcher.tick(at())
             self.assertEqual(len(self.store.due(at())), 1)
         self.send.side_effect = None
@@ -124,7 +128,7 @@ class WatcherTests(unittest.IsolatedAsyncioTestCase):
             return Game("456", "other", "CNY", 2000, 1000, 50)
 
         self.source.game.side_effect = lookup
-        with self.assertLogs("deals", level="ERROR"):
+        with self.assertLogs("astrbot", level="ERROR"):
             await self.watcher.tick(at())
         self.assertEqual(self.send.await_args.args[0], PRIVATE)
 

@@ -223,6 +223,8 @@ python smoke_test.py --source steam
 python smoke_compare.py
 ```
 
+Smoke / 图片预览脚本现在也使用 AstrBot 内置 logger，请在安装了 AstrBot 的运行环境执行；离线单元测试使用测试专用 API 替身，无需安装完整 AstrBot。
+
 `smoke_compare.py` 会真实只读查询 Jump 和小黑盒马车8报价、小黑盒目录和当前折扣，结果随时间变化。自动测试验证金额、平台、版本、别名、权限、失败处理、独立指令、工具、日报分段及重启去重。
 
 完整 AstrBot 加载、实际模型选择工具和群聊/私聊投递，仍需在你的实例验证。主动消息使用 `Context.send_message`，适配器必须支持；AstrBot 上游注明 QQ 官方 API 平台不支持此发送方式。
